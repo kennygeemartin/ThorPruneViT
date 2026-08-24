@@ -1,0 +1,16 @@
+mapping_name: NIH-to-CheXpert shared-label evaluation
+entries:
+  - {nih_label: Atelectasis, nih_output_index: 0, chexpert_label: Atelectasis, chexpert_column: Atelectasis, compatible: true, reason: Direct named observation}
+  - {nih_label: Cardiomegaly, nih_output_index: 1, chexpert_label: Cardiomegaly, chexpert_column: Cardiomegaly, compatible: true, reason: Direct named observation}
+  - {nih_label: Effusion, nih_output_index: 2, chexpert_label: Pleural Effusion, chexpert_column: Pleural Effusion, compatible: true, reason: Accepted terminology mapping}
+  - {nih_label: Infiltration, nih_output_index: 3, chexpert_label: null, chexpert_column: null, compatible: false, reason: No scientifically exact equivalent}
+  - {nih_label: Mass, nih_output_index: 4, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
+  - {nih_label: Nodule, nih_output_index: 5, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
+  - {nih_label: Pneumonia, nih_output_index: 6, chexpert_label: Pneumonia, chexpert_column: Pneumonia, compatible: true, reason: Direct named observation}
+  - {nih_label: Pneumothorax, nih_output_index: 7, chexpert_label: Pneumothorax, chexpert_column: Pneumothorax, compatible: true, reason: Direct named observation}
+  - {nih_label: Consolidation, nih_output_index: 8, chexpert_label: Consolidation, chexpert_column: Consolidation, compatible: true, reason: Direct named observation}
+  - {nih_label: Edema, nih_output_index: 9, chexpert_label: Edema, chexpert_column: Edema, compatible: true, reason: Direct named observation}
+  - {nih_label: Emphysema, nih_output_index: 10, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
+  - {nih_label: Fibrosis, nih_output_index: 11, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
+  - {nih_label: Pleural_Thickening, nih_output_index: 12, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
+  - {nih_label: Hernia, nih_output_index: 13, chexpert_label: null, chexpert_column: null, compatible: false, reason: No exact equivalent}
