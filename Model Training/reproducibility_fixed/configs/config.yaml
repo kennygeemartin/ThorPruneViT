@@ -1,0 +1,47 @@
+experiment:
+  num_classes: 14
+  image_size: 224
+  patch_size: 16
+  seeds: [42, 123, 456]
+  device: auto
+
+nih:
+  metadata_csv: "PATH_TO_NIH/Data_Entry_2017.csv"
+  image_root: "PATH_TO_NIH/images"
+  frontal_only: true
+  split_ratios: [0.70, 0.10, 0.20]
+
+chexpert:
+  root: "PATH_TO_CHEXPERT"
+  train_csv: "PATH_TO_CHEXPERT/train.csv"
+  valid_csv: "PATH_TO_CHEXPERT/valid.csv"
+  uncertainty: u-ones
+  primary_uncertainty_policy: u-ones
+
+training:
+  pretrained_imagenet: true
+  epochs: 50
+  batch_size: 32
+  learning_rate: 0.0001
+  weight_decay: 0.05
+  dropout: 0.1
+  early_stopping_patience: 10
+  num_workers: 4
+
+pruning:
+  target_sparsity: 0.53
+  steps: 5
+  per_step_percentage_points: 0.106
+  alpha_grid: [0.25, 0.50, 0.75]
+  selection_metric: macro_auroc
+  score_batches: 8
+  finetune_epochs_per_step: 5
+  finetune_learning_rate: 0.00001
+
+latency:
+  batch_size: 1
+  warmup_iterations: 20
+  timed_iterations: 100
+
+sensitivity:
+  sparsities: [0.00, 0.30, 0.40, 0.50, 0.53, 0.60]
