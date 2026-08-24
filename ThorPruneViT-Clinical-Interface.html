@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ThorPruneViT — Clinical Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background:#0f172a; color:#e2e8f0; font-family:system-ui; }
+        .viewer-cell { background:#1e2937; }
+        .gauge { background:conic-gradient(#0066A1 0% var(--percent), #334155 var(--percent) 100%); }
+    </style>
+</head>
+<body class="min-h-screen">
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="w-72 bg-slate-950 border-r border-slate-800 p-6 flex flex-col">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-xl flex items-center justify-center text-white font-bold text-2xl">TV</div>
+            <div>
+                <h1 class="text-2xl font-semibold text-white">ThorPruneViT</h1>
+                <p id="modelSummary" class="text-xs text-amber-400">Checking model checkpoint…</p>
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <div class="text-xs uppercase tracking-widest text-slate-400 mb-2">Study Information</div>
+                <div class="bg-slate-900 rounded-2xl p-4 text-sm">
+                    <p><span class="text-slate-400">Image:</span> <span id="studyName" class="font-mono text-emerald-400">Not loaded</span></p>
+                    <p><span class="text-slate-400">Study Date:</span> <span id="studyDate">—</span></p>
+                    <p><span class="text-slate-400">Model:</span> Checkpoint metadata</p>
+                </div>
+            </div>
+            
+            <div>
+                <div class="text-xs uppercase tracking-widest text-slate-400 mb-2">System Status</div>
+                <div id="systemStatus" class="bg-emerald-950 border border-emerald-500 text-emerald-400 rounded-2xl p-4 text-sm font-medium">
+                    Checking inference service…
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-auto pt-8 border-t border-slate-800">
+            <button onclick="exportReport()" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-2xl font-medium flex items-center justify-center gap-2">
+                <span>Export Research JSON</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col">
+        <!-- Top Bar -->
+        <div class="h-14 border-b border-slate-800 bg-slate-950 flex items-center px-8 justify-between">
+            <div class="flex items-center gap-4">
+                <button id="headerUploadBtn" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl text-sm font-medium hidden">Upload New</button>
+                <span id="modeBtn" class="px-6 py-2 bg-slate-800 rounded-3xl text-sm font-medium">Pruned checkpoint</span>
+            </div>
+            <div class="text-xs text-slate-400">NIH thoracic disease classification • 14 labels • Research use only</div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="flex-1 flex flex-col items-center justify-center text-slate-500">
+            <svg class="w-16 h-16 mb-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"></path></svg>
+            <h2 class="text-xl font-medium text-slate-300 mb-2">No Study Loaded</h2>
+            <p class="mb-6 text-sm">Upload a chest X-Ray (JPEG/PNG) to begin inference</p>
+            <button id="uploadArea" class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-3xl font-medium transition-colors">
+                Upload Chest X-Ray
+            </button>
+        </div>
+
+        <!-- Workspace -->
+        <div class="flex-1 p-8 grid grid-cols-2 gap-8 overflow-auto hidden" id="workspace">
+            <!-- Viewer -->
+            <div class="grid grid-cols-2 gap-6 items-start">
+                <div class="viewer-cell rounded-3xl overflow-hidden border border-slate-700 w-full h-full flex flex-col">
+                    <div class="px-4 py-3 bg-slate-900 text-[10px] tracking-widest flex-shrink-0">ORIGINAL CHEST X-RAY</div>
+                    <div class="flex-1 flex items-center justify-center p-2">
+                        <canvas id="originalCanvas" class="max-w-full max-h-[60vh] object-contain"></canvas>
+                    </div>
+                </div>
+                <div class="viewer-cell rounded-3xl overflow-hidden border border-slate-700 w-full h-full flex flex-col">
+                    <div class="px-4 py-3 bg-slate-900 text-[10px] tracking-widest flex-shrink-0">ATTENTION HEATMAP</div>
+                    <div class="flex-1 flex items-center justify-center p-2">
+                        <canvas id="heatmapCanvas" class="max-w-full max-h-[60vh] object-contain"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analysis Panel -->
+            <div class="bg-slate-900 rounded-3xl p-8 flex flex-col">
+                <div id="primaryDiagnosis" class="text-4xl font-semibold text-blue-400 mb-2">—</div>
+                <div class="text-emerald-400 text-sm mb-8">Highest model output • Probability <span id="primaryConf">—</span>%</div>
+
+                <!-- Confidence Gauges -->
+                <div class="grid grid-cols-4 gap-4 mb-10" id="gauges"></div>
+
+                <!-- Disease List -->
+                <div class="flex-1 overflow-auto" id="diseaseList"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/plain" id="legacy-simulated-inference-removed">
+// Historical placeholder retained as inert text; real inference is in app.js.
+let tfReady = false;
+async function initTF() {
+    await tf.ready();
+    tfReady = true;
+}
+initTF();
+
+const DISEASE_CLASSES = ['No Finding', 'Cardiomegaly', 'Pneumonia', 'Pneumothorax', 'Edema'];
+const THRESHOLD = 0.5;
+let currentMode = 'pruned';
+let state = { image: null };
+
+const elements = {
+    emptyState: document.getElementById('emptyState'),
+    workspace: document.getElementById('workspace'),
+    originalCanvas: document.getElementById('originalCanvas'),
+    heatmapCanvas: document.getElementById('heatmapCanvas'),
+    diseaseList: document.getElementById('diseaseList'),
+    primaryDiagnosis: document.getElementById('primaryDiagnosis'),
+    primaryConf: document.getElementById('primaryConf'),
+    gauges: document.getElementById('gauges'),
+    headerUploadBtn: document.getElementById('headerUploadBtn')
+};
+
+async function processImage(image) {
+    elements.emptyState.classList.add('hidden');
+    elements.workspace.classList.remove('hidden');
+    elements.headerUploadBtn.classList.remove('hidden');
+
+    await new Promise(r => setTimeout(r, currentMode === 'pruned' ? 280 : 520));
+
+    // REAL TENSORFLOW.JS PROCESSING (ViT preprocessing pipeline)
+    const tensor = tf.browser.fromPixels(image)
+        .resizeNearestNeighbor([224, 224])
+        .toFloat()
+        .div(255.0)
+        .expandDims(0);
+
+    const mean = tf.tensor([0.485, 0.456, 0.406]).reshape([1,1,1,3]);
+    const std  = tf.tensor([0.229, 0.224, 0.225]).reshape([1,1,1,3]);
+    const normalized = tensor.sub(mean).div(std);
+
+    // Feature extraction from tensor (simulates pruned attention + FFN activation)
+    const features = await extractTensorFeatures(normalized);
+    
+    let probs = new Array(5).fill(0).map(() => Math.random() * 0.25);
+    // Intelligent mapping based on tensor-derived features
+    if (features.opacity > 0.55) { probs[2] = 0.88; probs[4] = 0.81; } // Pneumonia / Edema
+    if (features.heart > 0.62) probs[1] = 0.85; // Cardiomegaly
+    if (features.contrast > 0.68) probs[3] = 0.82; // Pneumothorax
+
+    const numFindings = Math.floor(Math.random() * 2) + 1;
+    for (let i = 0; i < numFindings; i++) {
+        const idx = Math.floor(Math.random() * 4) + 1;
+        probs[idx] = Math.max(probs[idx], 0.70 + Math.random() * 0.25);
+    }
+    probs = probs.map(p => Math.min(0.98, p));
+    if (currentMode === 'pruned') probs = probs.map(p => Math.max(0.48, p)); // regularization effect
+
+    const results = { probabilities: probs, inferenceTime: currentMode === 'pruned' ? 55 : 110 };
+    state.predictions = results;
+
+    const heatmap = generateHeatmap(image, features);
+    displayOriginalImage(image);
+    displayHeatmap(image, heatmap);
+    updateUI(results);
+
+    tf.dispose([tensor, normalized]); // memory cleanup
+}
+
+async function extractTensorFeatures(tensor) {
+    const data = await tensor.array();
+    let opacity = 0, heart = 0, contrast = 0;
+    const flat = data[0].flat(2);
+    for (let i = 0; i < flat.length; i++) {
+        const gray = (flat[i][0] + flat[i][1] + flat[i][2]) / 3;
+        opacity += (1 - gray);
+        contrast += Math.abs(gray - 0.5);
+        if (i > flat.length * 0.35 && i < flat.length * 0.65) heart += gray;
+    }
+    return {
+        opacity: opacity / flat.length,
+        heart: heart / flat.length,
+        contrast: contrast / flat.length
+    };
+}
+
+function generateHeatmap(image, features) {
+    const size = 14; // ViT standard 14x14 attention grid
+    const heatmap = [];
+    
+    // Determine focal points for attention
+    const foci = [];
+    const numFoci = features.opacity > 0.6 ? 2 : 1;
+    for (let i=0; i<numFoci; i++) {
+        foci.push({
+            cx: 3 + Math.random() * 8,
+            cy: 3 + Math.random() * 8,
+            strength: 0.6 + Math.random() * 0.4
+        });
+    }
+
+    for (let y = 0; y < size; y++) {
+        const row = [];
+        for (let x = 0; x < size; x++) {
+            let intensity = 0;
+            // Calculate distance to all focal points
+            for (const f of foci) {
+                const dist = Math.sqrt(Math.pow(x - f.cx, 2) + Math.pow(y - f.cy, 2));
+                intensity += f.strength * Math.exp(-(dist * dist) / 4);
+            }
+            // Baseline noise
+            intensity += Math.random() * 0.1;
+            row.push(Math.min(1, intensity));
+        }
+        heatmap.push(row);
+    }
+    return heatmap;
+}
+
+function displayOriginalImage(image) {
+    const c = elements.originalCanvas;
+    const ctx = c.getContext('2d');
+    c.width = image.width;
+    c.height = image.height;
+    ctx.drawImage(image, 0, 0, c.width, c.height);
+}
+
+function displayHeatmap(image, heatmap) {
+    const c = elements.heatmapCanvas;
+    const ctx = c.getContext('2d');
+    
+    // Create an offscreen canvas to scale the tiny heatmap safely
+    const offscreen = document.createElement('canvas');
+    offscreen.width = heatmap[0].length;
+    offscreen.height = heatmap.length;
+    const offCtx = offscreen.getContext('2d');
+    const imgData = offCtx.createImageData(offscreen.width, offscreen.height);
+
+    for (let y = 0; y < offscreen.height; y++) {
+        for (let x = 0; x < offscreen.width; x++) {
+            const i = (y * offscreen.width + x) * 4;
+            let val = heatmap[y][x];
+            
+            // Segment out areas of low attention to ONLY show disease hotspots
+            if (val < 0.25) {
+               imgData.data[i+3] = 0; // Fully transparent
+               continue;
+            }
+
+            imgData.data[i]   = Math.min(255, 255 * val); // R
+            imgData.data[i+1] = Math.min(255, 255 * (1 - Math.abs(val - 0.7))); // G
+            imgData.data[i+2] = Math.min(255, 255 * Math.max(0, 0.4 - val)); // B
+            
+            // Make the hotter areas more opaque but still let some x-ray show through
+            imgData.data[i+3] = Math.min(180, val * 220); 
+        }
+    }
+    offCtx.putImageData(imgData, 0, 0);
+
+    // Draw the original image first to overlay on
+    c.width = image.width;
+    c.height = image.height;
+    ctx.drawImage(image, 0, 0, c.width, c.height);
+
+    // Overlay segmented heatmap blocks by scaling them up with nearest-neighbor 
+    ctx.globalAlpha = 1.0;
+    ctx.imageSmoothingEnabled = false; // Preserves raw patch blocks from ViT
+    ctx.drawImage(offscreen, 0, 0, c.width, c.height);
+}
+
+function updateUI(results) {
+    const probs = results.probabilities;
+    const maxIdx = probs.indexOf(Math.max(...probs.slice(1)));
+    elements.primaryDiagnosis.textContent = DISEASE_CLASSES[maxIdx];
+    elements.primaryConf.textContent = (probs[maxIdx] * 100).toFixed(0);
+
+    // Gauges
+    let gaugeHTML = '';
+    probs.slice(1).forEach((p, i) => {
+        gaugeHTML += `
+            <div class="text-center">
+                <div class="gauge w-20 h-20 rounded-full mx-auto flex items-center justify-center text-xs font-bold" style="--percent:${p*100}%">${Math.round(p*100)}%</div>
+                <div class="text-[10px] mt-2 text-slate-400">${DISEASE_CLASSES[i+1]}</div>
+            </div>`;
+    });
+    elements.gauges.innerHTML = gaugeHTML;
+
+    // Disease list
+    let listHTML = '';
+    probs.forEach((prob, i) => {
+        const detected = prob > THRESHOLD && i > 0;
+        listHTML += `
+            <div class="flex justify-between items-center py-3 border-b border-slate-700 ${detected ? 'text-emerald-400' : ''}">
+                <span>${DISEASE_CLASSES[i]}</span>
+                <span class="font-mono">${(prob*100).toFixed(1)}%</span>
+            </div>`;
+    });
+    elements.diseaseList.innerHTML = listHTML;
+}
+
+function toggleMode() {
+    currentMode = currentMode === 'pruned' ? 'baseline' : 'pruned';
+    document.getElementById('modeBtn').textContent = currentMode === 'pruned' ? 'Pruned Mode (55 ms)' : 'Baseline Mode (110 ms)';
+    if (state.image) processImage(state.image);
+}
+
+function exportReport() {
+    const report = {
+        model: "ThorPruneViT-Pruned",
+        timestamp: new Date().toISOString(),
+        validation_accuracy: "94.3%",
+        inference_time_ms: document.getElementById('modeBtn').textContent.includes('55') ? 55 : 110,
+        findings: DISEASE_CLASSES.map((name, i) => ({
+            finding: name,
+            probability: state.predictions ? state.predictions.probabilities[i] : 0
+        }))
+    };
+    const blob = new Blob([JSON.stringify(report, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `ThorPruneViT-Report-${Date.now()}.json`;
+    a.click();
+}
+
+// Upload handling
+const fileInput = document.createElement('input');
+fileInput.id = 'fileInput';
+fileInput.type = 'file'; 
+fileInput.accept = 'image/*';
+
+document.getElementById('uploadArea').addEventListener('click', () => fileInput.click());
+elements.headerUploadBtn.addEventListener('click', () => fileInput.click());
+
+fileInput.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+        const img = new Image();
+        img.onload = () => {
+            state.image = img;
+            state.predictions = null;
+            processImage(img);
+        };
+        img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+</script>
+<script src="app.js"></script>
+</body>
+</html>
