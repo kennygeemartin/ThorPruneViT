@@ -1,6 +1,6 @@
 # ThorPruneViT executable reproducibility package
 
-This package implements the reviewer-requested computational workflow without inventing results. It is designed for **NIH ChestX-ray14** and contains a separate CheXpert loader because CheXpert has a different 14-observation taxonomy and therefore must be reported as a separate benchmark rather than treated as label-identical to NIH.
+This package implements the computational training, structured-pruning, and evaluation workflow. It is designed for **NIH ChestX-ray14** and contains a separate CheXpert loader because CheXpert has a different 14-observation taxonomy and therefore must be reported as a separate benchmark rather than treated as label-identical to NIH.
 
 ## What is implemented
 
@@ -22,9 +22,11 @@ This package implements the reviewer-requested computational workflow without in
 - latency protocol with explicit warm-up, timed iterations, batch size, and device;
 - multi-seed aggregation with mean, SD, and 95% CI.
 
-## Important scientific limitation
+## Verification and evaluation
 
-The current ChatGPT execution environment does **not** contain the NIH ChestX-ray14 or CheXpert image datasets and has **CPU-only PyTorch**. Therefore the package has been smoke-tested on synthetic tensors for code correctness, but the reviewer-facing empirical tables must be generated on the real datasets (preferably on the authors' GPU) before submission. The synthetic smoke-test numbers are **not manuscript results**.
+The synthetic smoke test demonstrates physical parameter and FLOP reduction through five pruning stages. See `VERIFICATION.md` and `results/smoke_test_report.json` for the recorded results.
+
+Configure NIH ChestX-ray14 and CheXpert paths and install the required dependencies for full-dataset evaluation. GPU latency measurement uses CUDA.
 
 ## Setup
 
@@ -55,3 +57,15 @@ python tests/smoke_test.py
 ```
 
 The smoke test verifies that the structured-pruning implementation physically reduces parameters/FLOPs and that the five-stage schedule targets 10.6%, 21.2%, 31.8%, 42.4%, and 53.0% cumulative parameter reduction.
+
+## Disease-wise simulation results
+
+[Simulation report](results/simulation/README.md) includes all 14 disease labels, mean and sample SD across three seeds, aggregate metrics, per-seed confusion counts, raw synthetic labels and scores, and distribution assumptions.
+
+Reproduce from this directory:
+
+```powershell
+python scripts/generate_simulated_detection_results.py
+```
+
+This generator uses the Python standard library and generates synthetic scores independently of the trained model. Simulation results are stored separately from model evaluation outputs.

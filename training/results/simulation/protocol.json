@@ -1,0 +1,19 @@
+{
+  "result_type": "SIMULATED",
+  "trained_model_used": false,
+  "description": "Illustrative detection-score simulation, not model inference.",
+  "seeds": [
+    42,
+    123,
+    456
+  ],
+  "samples_per_seed": 2000,
+  "threshold": 0.5,
+  "label_probability": 0.15,
+  "positive_logit_mean": 1.0,
+  "negative_logit_mean": -1.0,
+  "logit_standard_deviation": 1.0,
+  "disease_specific_assumptions": false,
+  "dependence": "Labels and score noise independent across samples and diseases.",
+  "uncertainty": "SD measures simulation variability across seeds, not clinical uncertainty."
+}

@@ -1,0 +1,98 @@
+{
+  "baseline_params": 80771,
+  "final_params": 36976,
+  "parameter_reduction": 0.5422119325005261,
+  "baseline_flops": 1384896,
+  "final_flops": 610240,
+  "flops_reduction": 0.5593604140671935,
+  "stages": [
+    {
+      "stage": 1,
+      "target_cumulative_parameter_sparsity": 0.10600000000000001,
+      "actual_parameter_sparsity": 0.10720431838159739,
+      "actual_head_sparsity": 0.125,
+      "actual_ffn_sparsity": 0.13671875,
+      "heads_remaining": 7,
+      "ffn_neurons_remaining": 221,
+      "parameters_remaining": 72112,
+      "FLOPs": 1229856,
+      "validation_macro_AUROC": 0.6666666666666667,
+      "validation_mean_per_class_accuracy": 0.75
+    },
+    {
+      "stage": 2,
+      "target_cumulative_parameter_sparsity": 0.21200000000000002,
+      "actual_parameter_sparsity": 0.21261343799135823,
+      "actual_head_sparsity": 0.125,
+      "actual_ffn_sparsity": 0.39453125,
+      "heads_remaining": 7,
+      "ffn_neurons_remaining": 155,
+      "parameters_remaining": 63598,
+      "FLOPs": 1086240,
+      "validation_macro_AUROC": 0.6666666666666667,
+      "validation_mean_per_class_accuracy": 0.75
+    },
+    {
+      "stage": 3,
+      "target_cumulative_parameter_sparsity": 0.318,
+      "actual_parameter_sparsity": 0.3180225576011192,
+      "actual_head_sparsity": 0.125,
+      "actual_ffn_sparsity": 0.65234375,
+      "heads_remaining": 7,
+      "ffn_neurons_remaining": 89,
+      "parameters_remaining": 55084,
+      "FLOPs": 942624,
+      "validation_macro_AUROC": 0.5,
+      "validation_mean_per_class_accuracy": 0.6666666666666666
+    },
+    {
+      "stage": 4,
+      "target_cumulative_parameter_sparsity": 0.42400000000000004,
+      "actual_parameter_sparsity": 0.4252268759827166,
+      "actual_head_sparsity": 0.25,
+      "actual_ffn_sparsity": 0.7890625,
+      "heads_remaining": 6,
+      "ffn_neurons_remaining": 54,
+      "parameters_remaining": 46425,
+      "FLOPs": 787584,
+      "validation_macro_AUROC": 0.6666666666666667,
+      "validation_mean_per_class_accuracy": 0.6666666666666666
+    },
+    {
+      "stage": 5,
+      "target_cumulative_parameter_sparsity": 0.53,
+      "actual_parameter_sparsity": 0.5422119325005261,
+      "actual_head_sparsity": 0.5,
+      "actual_ffn_sparsity": 0.82421875,
+      "heads_remaining": 4,
+      "ffn_neurons_remaining": 45,
+      "parameters_remaining": 36976,
+      "FLOPs": 610240,
+      "validation_macro_AUROC": 0.5,
+      "validation_mean_per_class_accuracy": 0.8333333333333334
+    }
+  ],
+  "metrics_keys": [
+    "exact_match_accuracy",
+    "hamming_accuracy",
+    "macro_auroc",
+    "macro_f1",
+    "macro_precision",
+    "macro_recall",
+    "mean_per_class_accuracy",
+    "micro_auroc",
+    "micro_f1",
+    "micro_precision",
+    "micro_recall"
+  ],
+  "structure": {
+    "heads_per_layer": [
+      2,
+      2
+    ],
+    "ffn_dims": [
+      21,
+      24
+    ]
+  }
+}

@@ -20,7 +20,7 @@ import torch.nn.functional as F
 from PIL import Image, UnidentifiedImageError
 
 ROOT = Path(__file__).resolve().parent
-MODEL_SOURCE = ROOT / "Model Training" / "reproducibility_fixed" / "src"
+MODEL_SOURCE = ROOT / "training" / "src"
 sys.path.insert(0, str(MODEL_SOURCE))
 
 from thorprunevit.model import count_parameters, load_pruned_model  # noqa: E402
