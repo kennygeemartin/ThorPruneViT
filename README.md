@@ -4,11 +4,13 @@ Structured vision-transformer pruning, multi-label evaluation, and a research im
 
 ## Results
 
+- [Table 8: supplied NIH disease-wise comparison](training/results/supplied/README.md): ViT-B/16 and ThorPruneViT AUROC, F1, and AUPRC, with model differences and macro summaries.
+
 - [Disease-wise simulation report](training/results/simulation/README.md): AUROC, accuracy, precision, sensitivity, specificity, and F1 across three seeds.
 - [Synthetic pruning verification](training/VERIFICATION.md): measured parameter reduction of 54.22% and FLOP reduction of 55.94% on the smoke-test model.
 - [Training and evaluation workflow](training/README.md).
 
-The disease-wise tables use generated labels and scores under explicit simulation assumptions. They describe an illustrative simulation, not trained-model performance. The pruning measurements come from the separate synthetic model smoke test.
+Table 8 stores the user-supplied NIH summary and its provenance. The simulation report uses generated labels and scores under explicit assumptions. The pruning measurements come from the separate synthetic model smoke test.
 
 ## Reproduce the simulation
 

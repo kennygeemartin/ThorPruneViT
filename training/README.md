@@ -7,7 +7,7 @@ This package implements the computational training, structured-pruning, and eval
 - patient-disjoint 70/10/20 NIH splitting and export of exact split CSVs;
 - ViT-B/16 multilabel baseline (14 disease labels);
 - class-balanced BCE (`pos_weight` computed from the training split only);
-- explicit Taylor importance: `mean(abs(activation ⊙ gradient))`;
+- explicit Taylor importance: `mean(abs(activation âŠ™ gradient))`;
 - structural magnitude importance;
 - weighted Taylor+magnitude score (default 0.5/0.5, globally normalized within component type);
 - **physical structured pruning** of attention heads and FFN neurons by model surgery;
@@ -69,3 +69,7 @@ python scripts/generate_simulated_detection_results.py
 ```
 
 This generator uses the Python standard library and generates synthetic scores independently of the trained model. Simulation results are stored separately from model evaluation outputs.
+
+## Supplied NIH comparison
+
+[Table 8](results/supplied/README.md) records the supplied ViT-B/16 and ThorPruneViT disease-wise AUROC, F1, and AUPRC values. CSV exports include all 14 labels, model differences, and macro summaries. Source information is in `results/supplied/provenance.json`.

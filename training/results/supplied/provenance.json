@@ -1,0 +1,12 @@
+{
+  "source_type": "user_supplied_summary",
+  "source": "Table 8 supplied in chat",
+  "date": "2026-10-06",
+  "dataset_description": "NIH ChestX-ray14 held-out test set, as supplied",
+  "aggregation": "Mean across three seeds, as supplied",
+  "independently_verified": false,
+  "per_seed_data_provided": false,
+  "auprc_convention": "Not supplied",
+  "macro_summary": "Unweighted mean of rounded disease values",
+  "table_sha256": "17c24380c807f95ef672ec2a47ba162208fc1a2d06c15e6470c0ecfc576d6aad"
+}
